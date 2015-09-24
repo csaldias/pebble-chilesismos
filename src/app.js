@@ -2,8 +2,14 @@
 // Original Code: Tyler Weimin Ouyang (github.com/tylerwowen/pebblequake), ouyang@cs.ucsb.edu
 
 var UI = require('ui');
+var splashWindow = new UI.Card({
+    title: "ChileSismos",
+    icon: "images/mini_icon.png",
+    body: "Cargando datos..."
+});
+splashWindow.show();
+
 var ajax = require('ajax');
-var Vector2 = require('vector2');
 var Vibe = require('ui/vibe');
 
 var parseFeed = function(data, quantity) {
@@ -26,22 +32,6 @@ var parseFeed = function(data, quantity) {
   // Finally return whole array
   return items;
 };
-
-// Show splash screen while waiting for data
-var splashWindow = new UI.Window({
-  backgroundColor: 'clear'
-});
-
-var logo_image = new UI.Image({
-  position: new Vector2(0, 0),
-  size: new Vector2(144, 144),
-  backgroundColor: 'clear',
-  image:'images/big_icon.png'
-});
-
-// Add to splashWindow and show
-splashWindow.add(logo_image);
-splashWindow.show();
 
 // Make request to CSN
 var query = "http://www.kimonolabs.com/api/9pzf9xze?apikey=e7TfDrOfQBQ42qtX6xTwg0D6sy6a9dJS";
