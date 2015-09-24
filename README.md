@@ -1,7 +1,6 @@
-# Earthquake!!
-A Watchapp that shows the newest earthquake information ranging from N30 to N45, W112 to W130. The data is from USGS
-
-1. Shows the newest 6 entries
-2. Updates every 5 minutes(You have to leave the app open)
-3. If there is any new earthquakes, you receive a double-vibration notification
-4. Shows the distance between you and the earthquake
+# ChileSismos
+Una aplicación que muestra, en tu Pebble, los últimos sismos ocurridos en Chile Continental. Los datos son obtenidos desde la USGS.
+1. Muestra los últimos 10 sismos ocurridos
+2. Se actualiza cada 5 minutos (debes dejar la app abierta)
+3. Si hay nuevos sismos, recibirás una alerta vibratoria
+4. Muestra la distancia del sismo respecto a tu ubicación actual

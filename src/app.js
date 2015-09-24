@@ -1,7 +1,6 @@
-// Tyler Weimin Ouyang
-// ouyang@cs.ucsb.edu
-//
-//
+// ChileSismos: muestra los últimos ocurridos en Chile con datos de la USGS
+// Original Code: Tyler Weimin Ouyang (github.com/tylerwowen/pebblequake), ouyang@cs.ucsb.edu
+
 var UI = require('ui');
 var ajax = require('ajax');
 var Vector2 = require('vector2');
@@ -10,15 +9,17 @@ var Vibe = require('ui/vibe');
 var parseFeed = function(data, quantity) {
   var items = [];
   for(var i = 0; i < quantity; i++) {
-    var mag = 'Mag: ' + data.features[i].properties.mag;
+    var mag = 'Magnitud ' + data.results.sismos[i].mag;
 
     // Get date/time substring
-    var time = new Date(data.features[i].properties.time);
-    var overview = time.getHours() + ':' + time.getMinutes() + ', ' + time.getDate() + '/' + (time.getMonth()+1);
+    var timestamp_raw = data.results.sismos[i].fecha.text;
+    var timestamp = timestamp_raw.split(" ");
+    var date = timestamp[0];
+    var time = timestamp[1];
     // Add to menu items array
     items.push({
       title:mag,
-      subtitle:overview
+      subtitle:date+" "+time
     });
   }
 
@@ -42,17 +43,8 @@ var logo_image = new UI.Image({
 splashWindow.add(logo_image);
 splashWindow.show();
 
-// Make request to USGS
-var d = new Date();
-d.setDate(d.getDate()-2);
-var past48Hours = d.toISOString();
-var query = 'http://earthquake.usgs.gov/fdsnws/event/1/query?'+
-    'format=geojson'+
-    '&starttime='+past48Hours+
-    '&minlatitude=25&minlongitude=80'+
-    '&maxlatitude=31&maxlongitude=90'+
-    '&limit=12'+
-    '&orderby=time';
+// Make request to CSN
+var query = "http://www.kimonolabs.com/api/9pzf9xze?apikey=e7TfDrOfQBQ42qtX6xTwg0D6sy6a9dJS";
 
 // Get user's location
 var locationOptions = {
@@ -102,12 +94,12 @@ ajax(
   },
   function(data) {
     // Create an array of Menu items
-    var menuItems = parseFeed(data, 12);
+    var menuItems = parseFeed(data, 10);
 
     // Construct Menu to show to user
     var resultsMenu = new UI.Menu({
       sections: [{
-        title: 'Recent Earthquakes',
+        title: 'Ultimos Terremotos',
         items: menuItems,
       }]
     });
@@ -115,27 +107,48 @@ ajax(
     // Add an action for SELECT
     resultsMenu.on('select', function(e) {
       // Get that forecast
-      var properties = data.features[e.itemIndex].properties;
-      var eqLat = data.features[e.itemIndex].geometry.coordinates[1];
-      var eqLon = data.features[e.itemIndex].geometry.coordinates[0];
-      // Assemble body string
-      var content = properties.place + ', ' + Math.round(getDistanceFromLatLonInKm(userLat,userLon,eqLat,eqLon)) + ' KM away';
+      var properties = data.results.sismos[e.itemIndex];
+      var eqLat = properties.lat;
+      var eqLon = properties.lon;
+      var dist = Math.round(getDistanceFromLatLonInKm(userLat,userLon,eqLat,eqLon)) + ' km';
+      var prof = properties.prof;
+      var ref = properties.ref;
 
-      // Add temperature, pressure etc
-      content += '\nLatitude: ' + eqLat.toFixed(2) + '°N' +
-        '\nLongtitude: ' + eqLon.toFixed(2) + '°E' +
-        '\nDepth: ' + (data.features[e.itemIndex].geometry.coordinates[2]).toFixed(2) + 'KM';
-
-      // Create the Card for detailed view
-      var detailCard = new UI.Card({
-        title:e.item.title,
-        subtitle:e.item.subtitle,
-        body: content,
-        style: "small",
-        scrollable :true
+      var details = [
+          {
+              title:"Magnitud",
+              subtitle:properties.mag
+          },
+          {
+              title:"Fecha y Hora",
+              subtitle:e.item.subtitle
+          },
+          {
+              title:"Ref. Geográfica",
+              subtitle:ref
+          },
+          {
+              title: "Profundidad",
+              subtitle: prof + ' km'
+          },
+          {
+              title:"Distancia",
+              subtitle:dist
+          },
+          {
+              title:"Latitud y Longitud",
+              subtitle:eqLat.substr(1) + '°S, ' + eqLon.substr(1) + '°W'
+          }
+          
+          
+      ];  
+      var detailMenu = new UI.Menu({
+          sections: [{
+              title: 'Detalles',
+              items: details,
+          }]
       });
-
-      detailCard.show();
+      detailMenu.show();
     });
 
     // Show the Menu, hide the splash
@@ -152,7 +165,7 @@ ajax(
         },
         // success
         function(data)  {
-          var newItems = parseFeed(data, 12);
+          var newItems = parseFeed(data, 10);
           if (newItems[0].subtitle != menuItems[0].subtitle) {
             // Update the Menu's first section
             splashWindow.hide();
@@ -182,7 +195,7 @@ ajax(
         },
         // success
         function(data)  {
-          var newItems = parseFeed(data, 12);
+          var newItems = parseFeed(data, 10);
           if (newItems[0].subtitle != menuItems[0].subtitle) {
             // Update the Menu's first section
             splashWindow.hide();
