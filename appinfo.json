@@ -33,17 +33,12 @@
                 "menuIcon": true,
                 "name": "IMAGES_MINI_ICON_PNG",
                 "type": "png"
-            },
-            {
-                "file": "images/big_icon.png",
-                "name": "IMAGES_BIG_ICON_PNG",
-                "type": "png"
             }
         ]
     },
     "sdkVersion": "3",
     "shortName": "ChileSismos",
-    "uuid": "0b59ebd1-56f0-4e23-a9de-4e79612df191",
+    "uuid": "01906520-81fb-4d7d-8a1c-b80f64575dea",
     "versionCode": 1,
     "versionLabel": "1.0",
     "watchapp": {
